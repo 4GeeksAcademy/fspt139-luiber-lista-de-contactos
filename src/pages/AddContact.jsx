@@ -26,12 +26,11 @@ export const AddContact = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const contactData = { name, email, phone, address };
 
     const url = id
       ? `https://playground.4geeks.com/contact/agendas/luiber/contacts/${id}`
-      : "https://playground.4geeks.com/contact/agendas/luiber/contacts";
+      : `https://playground.4geeks.com/contact/agendas/luiber/contacts`;
 
     const method = id ? "PUT" : "POST";
 
@@ -40,6 +39,17 @@ export const AddContact = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(contactData)
     })
+      .then((response) => {
+        if (response.status === 404 && !id) {
+          return fetch("https://playground.4geeks.com/contact/agendas/luiber", { method: "POST" })
+            .then(() => fetch(url, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(contactData)
+            }));
+        }
+        return response;
+      })
       .then((response) => {
         if (response.ok) {
           navigate("/");
